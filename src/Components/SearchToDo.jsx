@@ -1,12 +1,15 @@
 import "../App.css";
-import { Grid, TextField, Button, Typography } from "@material-ui/core";
+import { Grid, TextField, Button, Card, Divider } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import React, { useState } from "react";
-import backgroundImage from "../../src/Images/bg-desktop-dark.jpg";
+import React, { useEffect, useState } from "react";
+import DeleteIcon from "@material-ui/icons/Delete";
 
 const useStyles = makeStyles({
   root: {
     color: "black",
+  },
+  Card: {
+    width: "300px",
   },
 });
 
@@ -14,25 +17,54 @@ const SearchToDo = () => {
   const [text, setText] = useState("");
   const [todos, setToDos] = useState([]);
   const classes = useStyles();
+  
+  useEffect(
+    () => {
+      getToDos()
+    },[]
+  )
 
-  const hangleChange = (event) => {
+  useEffect(
+    () => {
+      saveToDos();
+    },
+    [todos]
+  );
+
+  const handleChange = (event) => {
     setText(event.target.value);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setToDos([
-      ...todos,
-      {
-        text: text,
-        id: Math.random() * 100,
-      },
-    ]);
+  const handleSubmit = () => {
+    let count = 1;
+    const toDos = [...todos];
+    const newToDos = [...toDos, { text: text, completed: false }];
+    const newKey = newToDos.map((newtodo) => ({ ...newtodo, id: count++ }));
+    setToDos(newKey);
+    setText("");
+  };
+
+  const deleteHandler = (id) => {
+    const allToDos = [...todos];
+    const updatedList = allToDos.filter((alltodos) => alltodos.id !== id);
+    setToDos(updatedList);
+  };
+
+  const saveToDos = () => {
+    localStorage.setItem("todos", JSON.stringify(todos));
+  };
+
+  const getToDos = () => {
+    if (localStorage.getItem("todos") === null) {
+      localStorage.setItem("todos", JSON.stringify([]));
+    } else {
+      const localStorageToDos = localStorage.setItem("todos", JSON.stringify(todos));
+      setToDos(localStorageToDos)
+    }
   };
   console.log(todos);
   return (
     <div>
-      <img src={backgroundImage} alt="pic" />
       <Grid
         container
         direction="row"
@@ -45,7 +77,7 @@ const SearchToDo = () => {
               style={{ width: "280px" }}
               label="Todos"
               value={text}
-              onChange={hangleChange}
+              onChange={handleChange}
             />
             <Button
               onClick={handleSubmit}
@@ -65,16 +97,26 @@ const SearchToDo = () => {
           alignItems: "flex-start",
         }}
       >
-        <h1 style={{ color: "black" }}> length : {todos.length}</h1>
+        <h1 style={{ color: "grey" }}> length : {todos.length}</h1>
       </div>
       {/* render the todos list */}
-      {todos.map((todo, idx) => {
-        return (
-          <div key={idx}>
-            <h2 style={{ color: "black" }}>{todo.text}</h2>
-          </div>
-        );
-      })}
+      <Card className={classes.Card}>
+        {todos.map((todo) => {
+          return (
+            <div key={todo.id}>
+              <h2 style={{ color: "grey" }}>
+                {todo.text}{" "}
+                <DeleteIcon
+                  style={{ cursor: "pointer" }}
+                  onClick={() => deleteHandler(todo.id)}
+                  color="primary"
+                />
+              </h2>
+              <Divider orientation="horizontal" />
+            </div>
+          );
+        })}
+      </Card>
     </div>
   );
 };
