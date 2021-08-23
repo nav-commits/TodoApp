@@ -4,3 +4,9 @@
 }
 
 
+
+body{
+  background-image: url('./../src/Images/bg-desktop-dark.jpg');
+  background-color: black;
+  background-repeat: no-repeat;
+}
