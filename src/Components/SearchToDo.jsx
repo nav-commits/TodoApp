@@ -1,38 +1,64 @@
 import "../App.css";
-import { Grid, TextField, Button, Card, Divider } from "@material-ui/core";
+import {
+  Grid,
+  TextField,
+  Button,
+  Card,
+  Divider,
+  Typography,
+} from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import React, { useEffect, useState } from "react";
 import DeleteIcon from "@material-ui/icons/Delete";
+import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 
 const useStyles = makeStyles({
   root: {
     color: "black",
   },
   Card: {
-    width: "300px",
+    width: "100%",
+  },
+  lineAcross: {
+    textDecoration: "line-through",
   },
 });
 
 const SearchToDo = () => {
   const [text, setText] = useState("");
   const [todos, setToDos] = useState([]);
+  // const [status, SetStatus] = useState("All");
+  // const [filtered, setFiltered] = useState([]);
   const classes = useStyles();
-  
-  useEffect(
-    () => {
-      getToDos()
-    },[]
-  )
 
-  useEffect(
-    () => {
-      saveToDos();
-    },
-    [todos]
-  );
+  // filter todos
+  // useEffect(() => {
+  //   filterFunction()
+  // }, [todos,status]);
+
+  useEffect(() => {
+    getToDos();
+  }, []);
+
+  useEffect(() => {
+    saveToDos();
+  }, [todos]);
 
   const handleChange = (event) => {
     setText(event.target.value);
+  };
+
+  const filterFunction = (e) => {
+    const targetFilter = e.target.value
+    if (targetFilter === "All") {
+     setToDos(todos);
+    } else if (targetFilter === "Completed") {
+      const completedToDos = todos.filter((todo) => todo.completed === true);
+      setToDos(completedToDos)
+    } else if (targetFilter === "UnCompleted") {
+      const unCompletedToDos = todos.filter((todo) => todo.completed === false);
+      setToDos(unCompletedToDos)
+    }
   };
 
   const handleSubmit = () => {
@@ -50,16 +76,28 @@ const SearchToDo = () => {
     setToDos(updatedList);
   };
 
+  const completeHandler = (oldtodo) => {
+    setToDos(
+      todos.map((item) => {
+        if (item.id === oldtodo) {
+          return { ...item, completed: !item.completed };
+        }
+        return item;
+      })
+    );
+  };
+
+  // save todos in localstorage
   const saveToDos = () => {
     localStorage.setItem("todos", JSON.stringify(todos));
   };
-
+  // get todos from localstorage
   const getToDos = () => {
     if (localStorage.getItem("todos") === null) {
       localStorage.setItem("todos", JSON.stringify([]));
     } else {
-      const localStorageToDos = localStorage.setItem("todos", JSON.stringify(todos));
-      setToDos(localStorageToDos)
+      const localStorageToDos = JSON.parse(localStorage.getItem("todos"));
+      setToDos(localStorageToDos);
     }
   };
   console.log(todos);
@@ -97,26 +135,60 @@ const SearchToDo = () => {
           alignItems: "flex-start",
         }}
       >
-        <h1 style={{ color: "grey" }}> length : {todos.length}</h1>
+        <h1 style={{ color: "grey" }}> ToDos : {todos.length}</h1>
       </div>
       {/* render the todos list */}
       <Card className={classes.Card}>
         {todos.map((todo) => {
           return (
             <div key={todo.id}>
-              <h2 style={{ color: "grey" }}>
+              <h1
+                className={todo.completed ? classes.lineAcross : null}
+                style={{ color: "grey" }}
+              >
                 {todo.text}{" "}
+                <CheckCircleIcon
+                  color={todo.completed ? 'secondary' : "primary"}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => completeHandler(todo.id)}
+                />
                 <DeleteIcon
                   style={{ cursor: "pointer" }}
                   onClick={() => deleteHandler(todo.id)}
                   color="primary"
                 />
-              </h2>
+              </h1>
               <Divider orientation="horizontal" />
             </div>
           );
         })}
       </Card>
+      <div style={{ marginTop: "50px" }}>
+        <Button
+          style={{ backgroundColor: "blue", marginRight: "10px" }}
+          color="primary"
+          onClick={filterFunction}
+          value='All'
+        >
+          All
+        </Button>
+        <Button
+          onClick={filterFunction}
+          style={{ backgroundColor: "blue" }}
+          color="primary"
+          value='Completed'
+        >
+          Completed
+        </Button>
+        <Button
+          onClick={filterFunction}
+          style={{ backgroundColor: "blue" }}
+          color="primary"
+          value='UnCompleted'
+        >
+          UnCompleted
+        </Button>
+      </div>
     </div>
   );
 };
