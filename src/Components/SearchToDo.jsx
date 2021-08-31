@@ -27,14 +27,20 @@ const useStyles = makeStyles({
 const SearchToDo = () => {
   const [text, setText] = useState("");
   const [todos, setToDos] = useState([]);
-  // const [status, SetStatus] = useState("All");
-  // const [filtered, setFiltered] = useState([]);
+  const [status, SetStatus] = useState("All");
+  const [filtered, setFiltered] = useState([]);
   const classes = useStyles();
 
   // filter todos
-  // useEffect(() => {
-  //   filterFunction()
-  // }, [todos,status]);
+  useEffect(() => {
+    if (status === "All") {
+      setFiltered(todos);
+    } else if (status === "Completed") {
+      setFiltered(todos.filter((todo) => todo.completed === true));
+    } else if (status === "UnCompleted") {
+      setFiltered(todos.filter((todo) => todo.completed === false));
+    }
+  }, [todos, status]);
 
   useEffect(() => {
     getToDos();
@@ -46,19 +52,6 @@ const SearchToDo = () => {
 
   const handleChange = (event) => {
     setText(event.target.value);
-  };
-
-  const filterFunction = (e) => {
-    const targetFilter = e.target.value
-    if (targetFilter === "All") {
-     setToDos(todos);
-    } else if (targetFilter === "Completed") {
-      const completedToDos = todos.filter((todo) => todo.completed === true);
-      setToDos(completedToDos)
-    } else if (targetFilter === "UnCompleted") {
-      const unCompletedToDos = todos.filter((todo) => todo.completed === false);
-      setToDos(unCompletedToDos)
-    }
   };
 
   const handleSubmit = () => {
@@ -139,7 +132,7 @@ const SearchToDo = () => {
       </div>
       {/* render the todos list */}
       <Card className={classes.Card}>
-        {todos.map((todo) => {
+        {filtered.map((todo) => {
           return (
             <div key={todo.id}>
               <h1
@@ -148,7 +141,7 @@ const SearchToDo = () => {
               >
                 {todo.text}{" "}
                 <CheckCircleIcon
-                  color={todo.completed ? 'secondary' : "primary"}
+                  color={todo.completed ? "secondary" : "primary"}
                   style={{ cursor: "pointer" }}
                   onClick={() => completeHandler(todo.id)}
                 />
@@ -165,26 +158,31 @@ const SearchToDo = () => {
       </Card>
       <div style={{ marginTop: "50px" }}>
         <Button
-          style={{ backgroundColor: "blue", marginRight: "10px" }}
+          style={{
+            backgroundColor: "blue",
+            marginRight: "10px",
+            color: "white",
+          }}
           color="primary"
-          onClick={filterFunction}
-          value='All'
+          onClick={() => SetStatus("All")}
         >
           All
         </Button>
         <Button
-          onClick={filterFunction}
-          style={{ backgroundColor: "blue" }}
+          onClick={() => SetStatus("Completed")}
+          style={{
+            backgroundColor: "blue",
+            marginRight: "10px",
+            color: "white",
+          }}
           color="primary"
-          value='Completed'
         >
           Completed
         </Button>
         <Button
-          onClick={filterFunction}
-          style={{ backgroundColor: "blue" }}
+          onClick={() => SetStatus("UnCompleted")}
+          style={{ backgroundColor: "blue", color: "white" }}
           color="primary"
-          value='UnCompleted'
         >
           UnCompleted
         </Button>

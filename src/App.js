@@ -5,7 +5,7 @@ import SearchToDo from "./Components/SearchToDo";
 const App = () => {
   return (
     <div className="App">
-      <h1>ToDoApp</h1>
+      <h1 style={{color:'white'}}>ToDoApp</h1>
       <SearchToDo/>
     </div>
   );
