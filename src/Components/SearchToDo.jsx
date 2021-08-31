@@ -94,6 +94,13 @@ const SearchToDo = () => {
     }
   };
   console.log(todos);
+
+  const removeAllItems = () => {
+    const emptyArray = [];
+    let toDos = [...todos];
+    toDos = emptyArray;
+    return setToDos(emptyArray);
+  };
   return (
     <div>
       <Grid
@@ -156,14 +163,13 @@ const SearchToDo = () => {
           );
         })}
       </Card>
-      <div style={{ marginTop: "50px" }}>
+      <div style={{ marginTop: "120px" }}>
         <Button
           style={{
             backgroundColor: "blue",
             marginRight: "10px",
             color: "white",
           }}
-          color="primary"
           onClick={() => SetStatus("All")}
         >
           All
@@ -175,17 +181,20 @@ const SearchToDo = () => {
             marginRight: "10px",
             color: "white",
           }}
-          color="primary"
         >
           Completed
         </Button>
         <Button
           onClick={() => SetStatus("UnCompleted")}
           style={{ backgroundColor: "blue", color: "white" }}
-          color="primary"
         >
           UnCompleted
         </Button>
+        <Typography style={{color:'white', marginTop:'20px'}}>Delete todos <DeleteIcon
+          style={{ cursor: "pointer", marginLeft:'10px' }}
+          onClick={removeAllItems}
+          color="primary"
+        /></Typography>
       </div>
     </div>
   );
